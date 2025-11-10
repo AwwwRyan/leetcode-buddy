@@ -32,6 +32,9 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
+      - name: Give Maven Wrapper execute permission
+        run: chmod +x mvnw
+
       - name: Build Spring Boot JAR
         run: |
           echo "Building the Spring Boot project..."
