@@ -1,0 +1,78 @@
+name: Deploy Spring Boot App to ECS via ECR
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: leetcode-buddy-repo
+  ECS_CLUSTER: leetcode-buddy-cluster
+  ECS_SERVICE: leetcode-buddy-service
+  CONTAINER_NAME: leetcode-buddy-container
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, tag, and push image to ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
+          IMAGE_TAG: latest
+        run: |
+          echo "Building Docker image..."
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          echo "Pushing image to ECR..."
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "Image pushed successfully."
+
+      - name: Deploy new image to ECS
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
+          IMAGE_TAG: latest
+          ECS_CLUSTER: ${{ env.ECS_CLUSTER }}
+          ECS_SERVICE: ${{ env.ECS_SERVICE }}
+          CONTAINER_NAME: ${{ env.CONTAINER_NAME }}
+        run: |
+          echo "Fetching current task definition..."
+          TASK_DEFINITION=$(aws ecs describe-services --cluster $ECS_CLUSTER --services $ECS_SERVICE --query "services[0].taskDefinition" --output text)
+
+          echo "Downloading task definition JSON..."
+          aws ecs describe-task-definition --task-definition $TASK_DEFINITION --query "taskDefinition" > task-def.json
+
+          echo "Updating image in task definition..."
+          NEW_IMAGE="$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          UPDATED_TASK_DEF=$(jq --arg IMAGE "$NEW_IMAGE" --arg CONTAINER "$CONTAINER_NAME" \
+            '(.containerDefinitions[] | select(.name==$CONTAINER) | .image) |= $IMAGE' task-def.json)
+
+          echo "$UPDATED_TASK_DEF" > new-task-def.json
+
+          echo "Registering new task definition..."
+          NEW_TASK_DEF_ARN=$(aws ecs register-task-definition \
+            --cli-input-json file://new-task-def.json \
+            --query "taskDefinition.taskDefinitionArn" --output text)
+
+          echo "Updating ECS service to use new task definition..."
+          aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --task-definition $NEW_TASK_DEF_ARN
+
+          aws ecs wait services-stable --cluster $ECS_CLUSTER --services $ECS_SERVICE
+          echo "✅ Deployment completed successfully!"

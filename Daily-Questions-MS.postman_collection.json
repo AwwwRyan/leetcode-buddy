@@ -1,0 +1,300 @@
+{
+	"info": {
+		"_postman_id": "daily-questions-ms-collection",
+		"name": "Daily Questions MS - AI Solution Generator",
+		"description": "Complete collection for testing the Daily Questions MS microservice with AI-powered LeetCode solutions",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Health Check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/daily-question/health",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"daily-question",
+						"health"
+					]
+				},
+				"description": "Test if the service is running"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Daily Question",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/daily-question",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"daily-question"
+					]
+				},
+				"description": "Get today's LeetCode problem with basic information"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Daily Question with Full Details",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/daily-question/daily-with-detail",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"daily-question",
+						"daily-with-detail"
+					]
+				},
+				"description": "Automatically fetch today's problem and its complete details"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Daily Question with Java Code",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/daily-question/daily-with-detail/java",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"daily-question",
+						"daily-with-detail",
+						"java"
+					]
+				},
+				"description": "Get daily problem with Java-specific code snippets"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Daily Question with Python Code",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/daily-question/daily-with-detail/python",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"daily-question",
+						"daily-with-detail",
+						"python"
+					]
+				},
+				"description": "Get daily problem with Python-specific code snippets"
+			},
+			"response": []
+		},
+		{
+			"name": "Get AI Solution - Python with Code",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/daily-question/ai-solution?language=python&includeCode=true",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"daily-question",
+						"ai-solution"
+					],
+					"query": [
+						{
+							"key": "language",
+							"value": "python",
+							"description": "Programming language for the solution"
+						},
+						{
+							"key": "includeCode",
+							"value": "true",
+							"description": "Whether to include code (true) or just approach (false)"
+						}
+					]
+				},
+				"description": "Generate AI solution for today's problem in Python with complete code"
+			},
+			"response": []
+		},
+		{
+			"name": "Get AI Solution - Java Approach Only",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/daily-question/ai-solution?language=java&includeCode=false",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"daily-question",
+						"ai-solution"
+					],
+					"query": [
+						{
+							"key": "language",
+							"value": "java",
+							"description": "Programming language for the solution"
+						},
+						{
+							"key": "includeCode",
+							"value": "false",
+							"description": "Whether to include code (true) or just approach (false)"
+						}
+					]
+				},
+				"description": "Generate AI solution approach for today's problem in Java (no code)"
+			},
+			"response": []
+		},
+		{
+			"name": "Get AI Solution - C++ with Code",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/daily-question/ai-solution?language=cpp&includeCode=true",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"daily-question",
+						"ai-solution"
+					],
+					"query": [
+						{
+							"key": "language",
+							"value": "cpp",
+							"description": "Programming language for the solution"
+						},
+						{
+							"key": "includeCode",
+							"value": "true",
+							"description": "Whether to include code (true) or just approach (false)"
+						}
+					]
+				},
+				"description": "Generate AI solution for today's problem in C++ with complete code"
+			},
+			"response": []
+		},
+		{
+			"name": "Get AI Solution - JavaScript with Code",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/daily-question/ai-solution?language=javascript&includeCode=true",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"daily-question",
+						"ai-solution"
+					],
+					"query": [
+						{
+							"key": "language",
+							"value": "javascript",
+							"description": "Programming language for the solution"
+						},
+						{
+							"key": "includeCode",
+							"value": "true",
+							"description": "Whether to include code (true) or just approach (false)"
+						}
+					]
+				},
+				"description": "Generate AI solution for today's problem in JavaScript with complete code"
+			},
+			"response": []
+		},
+		{
+			"name": "Get AI Solution for Specific Problem",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/daily-question/ai-solution/two-sum?language=python&includeCode=true",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"daily-question",
+						"ai-solution",
+						"two-sum"
+					],
+					"query": [
+						{
+							"key": "language",
+							"value": "python",
+							"description": "Programming language for the solution"
+						},
+						{
+							"key": "includeCode",
+							"value": "true",
+							"description": "Whether to include code (true) or just approach (false)"
+						}
+					]
+				},
+				"description": "Generate AI solution for a specific problem (replace 'two-sum' with actual titleSlug)"
+			},
+			"response": []
+		},
+		{
+			"name": "Test LeetCode Connection",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/daily-question/test-leetcode",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"daily-question",
+						"test-leetcode"
+					]
+				},
+				"description": "Test if the service can connect to LeetCode"
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8080",
+			"type": "string",
+			"description": "Base URL for the Daily Questions MS service"
+		}
+	]
+}
