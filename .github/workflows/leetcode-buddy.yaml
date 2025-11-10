@@ -62,25 +62,50 @@ jobs:
           CONTAINER_NAME: ${{ env.CONTAINER_NAME }}
         run: |
           echo "Fetching current task definition..."
-          TASK_DEFINITION=$(aws ecs describe-services --cluster $ECS_CLUSTER --services $ECS_SERVICE --query "services[0].taskDefinition" --output text)
+          TASK_DEFINITION=$(aws ecs describe-services \
+            --cluster $ECS_CLUSTER \
+            --services $ECS_SERVICE \
+            --query "services[0].taskDefinition" \
+            --output text)
 
           echo "Downloading task definition JSON..."
-          aws ecs describe-task-definition --task-definition $TASK_DEFINITION --query "taskDefinition" > task-def.json
+          aws ecs describe-task-definition --task-definition $TASK_DEFINITION \
+            --query "taskDefinition" > task-def.json
 
           echo "Updating image in task definition..."
           NEW_IMAGE="$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-          UPDATED_TASK_DEF=$(jq --arg IMAGE "$NEW_IMAGE" --arg CONTAINER "$CONTAINER_NAME" \
-            '(.containerDefinitions[] | select(.name==$CONTAINER) | .image) |= $IMAGE' task-def.json)
 
-          echo "$UPDATED_TASK_DEF" > new-task-def.json
+          # Remove read-only fields that can't be re-registered
+          jq 'del(
+            .status,
+            .revision,
+            .taskDefinitionArn,
+            .requiresAttributes,
+            .compatibilities,
+            .registeredAt,
+            .registeredBy
+          )' task-def.json > clean-task-def.json
+
+          # Update container image
+          jq --arg IMAGE "$NEW_IMAGE" --arg CONTAINER "$CONTAINER_NAME" \
+            '(.containerDefinitions[] | select(.name==$CONTAINER) | .image) |= $IMAGE' \
+            clean-task-def.json > new-task-def.json
 
           echo "Registering new task definition..."
           NEW_TASK_DEF_ARN=$(aws ecs register-task-definition \
             --cli-input-json file://new-task-def.json \
-            --query "taskDefinition.taskDefinitionArn" --output text)
+            --query "taskDefinition.taskDefinitionArn" \
+            --output text)
 
           echo "Updating ECS service to use new task definition..."
-          aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --task-definition $NEW_TASK_DEF_ARN
+          aws ecs update-service \
+            --cluster $ECS_CLUSTER \
+            --service $ECS_SERVICE \
+            --task-definition $NEW_TASK_DEF_ARN
 
-          aws ecs wait services-stable --cluster $ECS_CLUSTER --services $ECS_SERVICE
+          echo "Waiting for ECS service to stabilize..."
+          aws ecs wait services-stable \
+            --cluster $ECS_CLUSTER \
+            --services $ECS_SERVICE
+
           echo "✅ Deployment completed successfully!"
