@@ -324,7 +324,7 @@ public class DailyQuestionController {
 
     @GetMapping("/health")
     public Mono<ResponseEntity<String>> healthCheck() {
-        return Mono.just(ResponseEntity.ok("Service is running and im the goat"));
+        return Mono.just(ResponseEntity.ok("Service is running and this is exam"));
     }
 
     @GetMapping("/test-leetcode")
